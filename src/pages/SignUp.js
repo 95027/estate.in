@@ -21,29 +21,33 @@ const SignUp = () => {
     try {
 
       if(name && email && password){
-        const auth = getAuth();
-        const userCredential =await createUserWithEmailAndPassword(auth, email, password);
-        updateProfile(auth.currentUser, {
-          displayName: name
-        })
-        const user = userCredential.user;
-        //console.log(user);
-        const formDataCopy = {email,name};
-        formDataCopy.timestamp = serverTimestamp();
-  
-        await setDoc(doc(db, "users", user.uid), formDataCopy);
-  
-        toast.success("registration was successful");
-  
-        navigate('/');
+        if(password.length<6){
+          toast.error("password should contain atleast 6 characters !");
+        }
+        else{
+          const auth = getAuth();
+          const userCredential =await createUserWithEmailAndPassword(auth, email, password);
+          updateProfile(auth.currentUser, {
+            displayName: name
+          })
+          const user = userCredential.user;
+          //console.log(user);
+          const formDataCopy = {email,name};
+          formDataCopy.timestamp = serverTimestamp();
+    
+          await setDoc(doc(db, "users", user.uid), formDataCopy);
+    
+          toast.success("registration was successful");
+    
+          navigate('/');
+        }
       }
       else{
-        toast.error("Something went wrong !");
+        toast.error("need to fill all the fields !");
       }
 
     } catch (error) {
-      //console.log(error);
-      toast.error("Something went wrong !");
+      console.log(error);
     }
   }
 
@@ -73,8 +77,8 @@ const SignUp = () => {
             <div className='mb-6 flex items-center before:border-t-2 before:flex-1 before:border-gray-300 after:border-t-2 after:flex-1 after:border-gray-300'>
               <p className='text-center font-semibold mx-4'>OR</p>
             </div>
-            <Oauth/>
           </form>
+          <Oauth/>
         </div>
       </div>
     </section>

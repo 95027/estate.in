@@ -2,10 +2,26 @@ import { useState } from 'react';
 import loginImg from '../assets/loginImg.webp';
 import { NavLink } from 'react-router-dom';
 import Oauth from '../components/Oauth';
+import { toast } from 'react-toastify';
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
 
 const ForgotPassword = () => {
 
   const [email, setEmail] = useState('');
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+
+    try {
+
+      const auth = getAuth();
+      await sendPasswordResetEmail(auth, email);
+      toast.success("Email was sent successfully");
+      
+    } catch (error) {
+      toast.error("Could not send reset password");
+    }
+  }
 
   return (
     <section>
@@ -15,7 +31,7 @@ const ForgotPassword = () => {
           <img src={loginImg} alt="signIn" className='w-full rounded-2xl'/>
         </div>
         <div className='w-[70%] md:w-[40%] md:ml-10'>
-          <form>
+          <form onSubmit={submitHandler}>
             <div className='mb-6'>
               <input className='w-full px-4 py-2 text-gray-700 text-sm border-gray-300 rounded-md sm:text-[18px] placeholder:opacity-50 placeholder:text-[16px]' type="email" placeholder='Email address' value={email} onChange={(e)=>setEmail(e.target.value)}/>
             </div>
