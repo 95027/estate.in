@@ -1,13 +1,51 @@
 import { useState } from 'react';
 import loginImg from '../assets/loginImg.webp';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import Oauth from '../components/Oauth';
+import {getAuth, createUserWithEmailAndPassword, updateProfile} from 'firebase/auth';
+import { db } from '../firebase/config';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 
 const SignUp = () => {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const navigate = useNavigate();
+
+  const submitHandler =async (e) => {
+    e.preventDefault();
+
+    try {
+
+      if(name && email && password){
+        const auth = getAuth();
+        const userCredential =await createUserWithEmailAndPassword(auth, email, password);
+        updateProfile(auth.currentUser, {
+          displayName: name
+        })
+        const user = userCredential.user;
+        //console.log(user);
+        const formDataCopy = {email,name};
+        formDataCopy.timestamp = serverTimestamp();
+  
+        await setDoc(doc(db, "users", user.uid), formDataCopy);
+  
+        toast.success("registration was successful");
+  
+        navigate('/');
+      }
+      else{
+        toast.error("Something went wrong !");
+      }
+
+    } catch (error) {
+      //console.log(error);
+      toast.error("Something went wrong !");
+    }
+  }
 
   return (
     <section>
@@ -17,7 +55,7 @@ const SignUp = () => {
           <img src={loginImg} alt="signIn" className='w-full rounded-2xl'/>
         </div>
         <div className='w-[70%] md:w-[40%] md:ml-10'>
-          <form>
+          <form onSubmit={submitHandler}>
             <div className='mb-6'>
               <input className='w-full px-4 py-2 text-gray-700 text-sm border-gray-300 rounded-md sm:text-[18px] placeholder:opacity-50 placeholder:text-[16px]' type="text" placeholder='Full Name' value={name} onChange={(e)=>setName(e.target.value)}/>
             </div>
