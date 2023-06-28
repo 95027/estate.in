@@ -6,6 +6,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Offers from "./pages/Offers";
 import PrivateRoute from "./components/PrivateRoute";
+import CreateListing from "./pages/CreateListing";
 
 
 const Routings = () => {
@@ -20,6 +21,7 @@ const Routings = () => {
           <Route path="/sign-in" element={<SignIn/>}/>
           <Route path="/sign-up" element={<SignUp/>}/>
           <Route path="/forgot" element={<ForgotPassword/>}/>
+          <Route path="/create-listing" element={<CreateListing/>}/>
         </Routes>
     </>
   )

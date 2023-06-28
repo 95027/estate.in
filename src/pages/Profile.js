@@ -1,9 +1,10 @@
 import { useState } from "react";
 import {getAuth, updateProfile} from 'firebase/auth';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import { toast } from "react-toastify";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
+import {FaHome} from 'react-icons/fa';
 
 const Profile = () => {
 
@@ -49,9 +50,9 @@ const Profile = () => {
     <>
       <section className="max-w-6xl mx-auto p-1">
         <h1 className="text-2xl text-center text-blue-900 font-bold mt-6">My Profile</h1>
-        <div className="w-full md:w-[50%] mt-6 px-3 py-1 mx-auto rounded-md border-[1px] border-blue-900">
-          <form>
-            <div className="flex items-center">
+        <div className="w-full md:w-[50%] mt-6 px-3 py-1 mx-auto">
+          <form className="border-[1px] border-blue-900 rounded-md p-1">
+            <div className="flex items-center ">
               <label className="mb-5 mr-1 whitespace-nowrap font-semibold text-xs sm:text-sm md:text-base">User Name: </label>
               <input type="text" value={name} onChange={(e)=>setName(e.target.value)} disabled={!edit}  className="w-full px-4 py-2 text-xs sm:text-sm  md:text-lg  text-gray-700 border-none focus:ring-0 rounded-md mb-6 disabled:bg-transparent disabled:text-blue-900 disabled:font-bold"/>
             </div>
@@ -64,6 +65,11 @@ const Profile = () => {
               <p onClick={signOut} className="text-blue-600 hover:text-blue-800 transition ease-in-out duration-200 cursor-pointer">Sign Out</p>
             </div>
           </form>
+            <button type="submit" className="w-full bg-blue-600 mt-6 px-7 py-2 uppercase rounded-md text-white text-sm font-medium flex items-center justify-center shadow-md hover:bg-blue-700 transition duration-150 ease-in-out active:bg-blue-800">
+              <NavLink to="/create-listing" className="flex items-center justify-center whitespace-nowrap">
+                <FaHome className="md:mr-2 mr-1 text-black md:text-3xl text-2xl bg-red-200 rounded-full p-1 border-2"/><span className="text-xs md:text-base">Sell or rent your home</span>
+              </NavLink>
+            </button>
         </div>
       </section>
     </>
