@@ -18,10 +18,12 @@ const Routings = () => {
           <Route path="/profile" element={<PrivateRoute/>}>
             <Route path="/profile" element={<Profile/>}/>
           </Route>
+          <Route path="create-listing" element={<PrivateRoute/>}>
+            <Route path="/create-listing" element={<CreateListing/>}/>
+          </Route>
           <Route path="/sign-in" element={<SignIn/>}/>
           <Route path="/sign-up" element={<SignUp/>}/>
           <Route path="/forgot" element={<ForgotPassword/>}/>
-          <Route path="/create-listing" element={<CreateListing/>}/>
         </Routes>
     </>
   )

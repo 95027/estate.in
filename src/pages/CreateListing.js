@@ -1,6 +1,19 @@
 import { useState } from 'react';
+import Spinner from '../components/Spinner';
+import { toast } from 'react-toastify';
+import {getStorage, ref, uploadBytesResumable, getDownloadURL} from 'firebase/storage';
+import {getAuth} from 'firebase/auth';
+import {v4 as uuidv4} from 'uuid';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase/config';
+import { useNavigate } from 'react-router-dom';
 
 const CreateListing = () => {
+
+  const auth = getAuth();
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     type : "rent",
@@ -12,24 +25,132 @@ const CreateListing = () => {
     address : "",
     description : "",
     offer: false,
-    regularPrice: 0,
-    discountedPrice: 0,
+    regularPrice : 0,
+    discountedPrice : 0,
+    images : {},
+    latitude : "",
+    longitude : "",
   })
 
-  const {type, name, beds, baths, parking, furnished, address, description, offer, regularPrice, discountedPrice} = formData;
+  const {type, name, beds, baths, parking, furnished, address, description, offer, regularPrice, discountedPrice, images, latitude, longitude} = formData;
 
-  const changeFormData = () => {
+  const changeFormData = (e) => {
+    let boolean = null;
+
+    if(e.target.value === "true"){
+      boolean = true;
+    }
+    if(e.target.value === "false"){
+      boolean = false;
+    }
+    //files
+    if(e.target.files){
+      setFormData((prevState)=>({
+        ...prevState,
+        images : e.target.files
+      }))
+    }
+    //text / boolean / number
+    if(!e.target.files){
+      setFormData((prevState)=>({
+        ...prevState,
+        [e.target.id] : boolean ?? e.target.value
+      }))
+    }
+  }
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if(+discountedPrice >= +regularPrice){
+      setLoading(false);
+      toast.error("Discounted price must be less than regular price");
+      return;
+    }
+
+    if(images.length > 6){
+      setLoading(false);
+      toast.error("max 6 images are allowed !");
+      return;
+    }
+
+    async function storeImage(image){
+      return new Promise((resolve, reject)=>{
+        const storage = getStorage();
+        const filename = `${auth.currentUser.uid}-${image.name}-${uuidv4()}`;
+        const storageRef = ref(storage, filename);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+        // Register three observers:
+        // 1. 'state_changed' observer, called any time the state changes
+        // 2. Error observer, called on failure
+        // 3. Completion observer, called on successful completion
+        uploadTask.on('state_changed', 
+          (snapshot) => {
+            // Observe state change events such as progress, pause, and resume
+            // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+              case 'paused':
+                console.log('Upload is paused');
+                break;
+              case 'running':
+                console.log('Upload is running');
+                break;
+            }
+          }, 
+          (error) => {
+            // Handle unsuccessful uploads
+            reject(error);
+          }, 
+          () => {
+            // Handle successful uploads on complete
+            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              resolve(downloadURL);
+            });
+          }
+        );
+      })
+    }
+    const imgUrls = await Promise.all(
+      [...images].map((image)=> storeImage(image)))
+      .catch(error=>{
+        setLoading(false);
+        //console.log(error);
+        toast.error("Unable to update the images !");
+        return;
+      });
+    
+    const formDataCopy = {
+      ...formData,
+      imgUrls,
+      timestamp : serverTimestamp(),
+    }
+    delete formDataCopy.images;
+    !formDataCopy.offer && delete formDataCopy.discountedPrice;
+
+    const docRef = await addDoc(collection(db, "listings"),formDataCopy);
+    setLoading(false);
+    toast.success("Listing created successfully !");
+
+    navigate(`/category/${formDataCopy.type}/${docRef.id}`);
 
   }
 
+
+  if(loading){
+    return <Spinner/>
+  }
   return (
     <main className="max-w-md mx-auto px-2">
       <h1 className="text-xl md:text-3xl text-center font-bold mt-6 text-blue-800">Create a Listing</h1>
-      <form >
+      <form onSubmit = {submitHandler}>
         <p className="text-base sm:text-lg font-semibold mt-6">Sell / Rent</p>
         <div className="flex">
-          <button type="button" value={type} id="type" onClick={changeFormData} className={`w-full mr-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${type === "rent" ? "bg-white text-black" : "bg-slate-600 text-white"}`}>sell</button>
-          <button type="button" value={type} id="type" onClick={changeFormData} className={`w-full ml-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${type === "sale" ? "bg-white text-black" : "bg-slate-600 text-white"}`}>rent</button>
+          <button type="button" value="sale" id="type" onClick={changeFormData} className={`w-full mr-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${type === "rent" ? "bg-white text-black" : "bg-slate-600 text-white"}`}>sell</button>
+          <button type="button" value="rent" id="type" onClick={changeFormData} className={`w-full ml-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${type === "sale" ? "bg-white text-black" : "bg-slate-600 text-white"}`}>rent</button>
         </div>
         <p className="text-base sm:text-lg font-semibold mt-6">Name</p>
         <input type="text" placeholder="Name" id="name" value={name} onChange={changeFormData} maxLength="32" minLength="8" required className="w-full px-4 py-2 text-xl text-gray-700 rounded-md bg-white border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
@@ -45,33 +166,45 @@ const CreateListing = () => {
         </div>
         <p className="text-base sm:text-lg font-semibold">Parking Spot</p>
         <div className="flex">
-          <button type="button" value={parking} id="parking" onClick={changeFormData} className={`w-full mr-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${!parking ? "bg-white text-black" : "bg-slate-600 text-white"}`}>yes</button>
-          <button type="button" value={parking} id="parking" onClick={changeFormData} className={`w-full ml-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${ parking ? "bg-white text-black" : "bg-slate-600 text-white"}`}>no</button>
+          <button type="button" value="true" id="parking" onClick={changeFormData} className={`w-full mr-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${!parking ? "bg-white text-black" : "bg-slate-600 text-white"}`}>yes</button>
+          <button type="button" value="false" id="parking" onClick={changeFormData} className={`w-full ml-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${ parking ? "bg-white text-black" : "bg-slate-600 text-white"}`}>no</button>
         </div>
         <p className="text-base sm:text-lg font-semibold mt-6">Furnished</p>
         <div className="flex">
-          <button type="button" value={furnished} id="furnished" onClick={changeFormData} className={`w-full mr-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${ !furnished ? "bg-white text-black" : "bg-black text-white"}`}>yes</button>
-          <button type="button" value={furnished} id="furnished" onClick={changeFormData} className={`w-full ml-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${ furnished ? "bg-white text-black" : "bg-slate-600 text-white"}`}>no</button>
+          <button type="button" value="true" id="furnished" onClick={changeFormData} className={`w-full mr-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${ !furnished ? "bg-white text-black" : "bg-slate-600 text-white"}`}>yes</button>
+          <button type="button" value="false" id="furnished" onClick={changeFormData} className={`w-full ml-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${ furnished ? "bg-white text-black" : "bg-slate-600 text-white"}`}>no</button>
         </div>
-        <p className="text-base sm:text-lg font-semibold mt-6">Address</p>
-        <textarea placeholder="Address" id="address" value={address} onChange={changeFormData} required className="w-full px-4 py-2 text-xl text-gray-700 rounded-md bg-white border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300 mb-6" />
+        <div className="mt-6 mb-6">
+          <p className="text-base sm:text-lg font-semibold">Address</p>
+          <textarea placeholder="Address" id="address" value={address} onChange={changeFormData} required className="w-full px-4 py-2 text-xl text-gray-700 rounded-md bg-white border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
+            <div className="w-full flex items-center space-x-6">
+              <div>
+                <p className="text-base sm:text-lg font-light">latitude</p>
+                <input type="number" id="latitude" value={latitude} onChange={changeFormData} min="-90" max="90" required className="w-full px-4 py-2 shadow-md rounded-md border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
+              </div>
+              <div>
+                <p className="text-base sm:text-lg font-light">longitude</p>
+                <input type="number" id="longitude" value={longitude} onChange={changeFormData} min="-180" max="180" required className="w-full px-4 py-2 shadow-md rounded-md border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
+              </div>
+            </div>
+        </div>
         <p className="text-base sm:text-lg font-semibold">Description</p>
         <textarea placeholder="Description" id="description" value={description} onChange={changeFormData} required className="w-full px-4 py-2 text-xl text-gray-700 rounded-md bg-white border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300 mb-6" />
         <p className="text-base sm:text-lg font-semibold">Offer</p>
         <div className="flex">
-          <button type="button" value={offer} id="offer" onClick={changeFormData} className={`w-full mr-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${!offer ? "bg-white text-black" : "bg-slate-600 text-white"}`}>yes</button>
-          <button type="button" value={parking} id="parking" onClick={changeFormData} className={`w-full ml-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${ offer ? "bg-white text-black" : "bg-slate-600 text-white"}`}>no</button>
+          <button type="button" value="true" id="offer" onClick={changeFormData} className={`w-full mr-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${!offer ? "bg-white text-black" : "bg-slate-600 text-white"}`}>yes</button>
+          <button type="button" value="false" id="offer" onClick={changeFormData} className={`w-full ml-3 px-7 py-3 font-medium text-sm uppercase shadow-md rounded-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out ${ offer ? "bg-white text-black" : "bg-slate-600 text-white"}`}>no</button>
         </div>
         <div className="flex items-center mt-6">
           <div>
             <p className="text-base sm:text-lg font-semibold">Regular Price</p>
             <div className="w-full flex items-center justify-center space-x-6">
-              <input type="number" id="regular-price" value={regularPrice} onChange={changeFormData} required min="50" className="w-full px-4 py-2 text-xl font-medium shadow-md rounded-md border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
+              <input type="number" id="regularPrice" value={regularPrice} onChange={changeFormData} required min="50" className="w-full px-4 py-2 text-xl font-medium shadow-md rounded-md border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
               {type === "rent" && (
               <div>
                 <p className="w-full whitespace-nowrap">$ / Month</p>
               </div>
-            )}
+              )}
             </div>
           </div>
         </div>
@@ -80,7 +213,7 @@ const CreateListing = () => {
             <div>
               <p className="text-base sm:text-lg font-semibold">Discounted Price</p>
               <div className="w-full flex items-center justify-center space-x-6">
-                <input type="number" id="discounted-price" value={discountedPrice} onChange={changeFormData} required={offer} className="w-full px-4 py-2 text-xl font-medium shadow-md rounded-md border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
+                <input type="number" id="discountedPrice" min="0" value={discountedPrice} onChange={changeFormData} required={offer} className="w-full px-4 py-2 text-xl font-medium shadow-md rounded-md border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
                 {type === "rent" && (
                  <div>
                   <p className="w-full whitespace-nowrap">$</p>
