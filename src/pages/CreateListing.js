@@ -98,6 +98,7 @@ const CreateListing = () => {
               case 'running':
                 console.log('Upload is running');
                 break;
+              default : break;
             }
           }, 
           (error) => {
@@ -127,6 +128,7 @@ const CreateListing = () => {
       ...formData,
       imgUrls,
       timestamp : serverTimestamp(),
+      userRef : auth.currentUser.uid,
     }
     delete formDataCopy.images;
     !formDataCopy.offer && delete formDataCopy.discountedPrice;
@@ -180,11 +182,11 @@ const CreateListing = () => {
             <div className="w-full flex items-center space-x-6">
               <div>
                 <p className="text-base sm:text-lg font-light">latitude</p>
-                <input type="number" id="latitude" value={latitude} onChange={changeFormData} min="-90" max="90" required className="w-full px-4 py-2 shadow-md rounded-md border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
+                <input type="number" step="any" id="latitude" value={latitude} onChange={changeFormData} min="-90" max="90" required className="w-full px-4 py-2 shadow-md rounded-md border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
               </div>
               <div>
                 <p className="text-base sm:text-lg font-light">longitude</p>
-                <input type="number" id="longitude" value={longitude} onChange={changeFormData} min="-180" max="180" required className="w-full px-4 py-2 shadow-md rounded-md border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
+                <input type="number" step="any" id="longitude" value={longitude} onChange={changeFormData} min="-180" max="180" required className="w-full px-4 py-2 shadow-md rounded-md border border-gray-300 focus:ring-0 focus:border-2 focus:bg-white focus:border-slate-300" />
               </div>
             </div>
         </div>
