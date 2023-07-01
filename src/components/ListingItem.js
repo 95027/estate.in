@@ -1,8 +1,11 @@
 import Moment from 'react-moment';
 import {NavLink} from 'react-router-dom';
 import { MdLocationOn } from 'react-icons/md';
+import { FaTrash } from 'react-icons/fa';
+import { MdEdit } from 'react-icons/md';
 
-const ListingItem = ({id, listing}) => {
+
+const ListingItem = ({id, listing, onDelete, onEdit}) => {
   return (
     <li className="relative bg-white flex flex-col justify-between items-center rounded-md shadow-md hover:shadow-lg overflow-hidden transition-shadow duration-150 m-[10px]">
       <NavLink className="contents" to ={`/category/${listing.type}/${id}`}>
@@ -28,6 +31,12 @@ const ListingItem = ({id, listing}) => {
           </div>
         </div>
       </NavLink>
+      {onDelete && (
+        <FaTrash className="absolute bottom-2 right-2 h-[14px] cursor-pointer text-red-500" onClick={()=>onDelete(listing.id)} />
+      )}
+      {onEdit && (
+        <MdEdit className="absolute bottom-2 right-8 h-4 cursor-pointer" onClick={()=>onEdit(listing.id)} />
+      )}
     </li>
   )
 }

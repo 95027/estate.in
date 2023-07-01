@@ -7,6 +7,7 @@ import SignUp from "./pages/SignUp";
 import Offers from "./pages/Offers";
 import PrivateRoute from "./components/PrivateRoute";
 import CreateListing from "./pages/CreateListing";
+import EditListing from "./pages/EditListing";
 
 
 const Routings = () => {
@@ -20,6 +21,9 @@ const Routings = () => {
           </Route>
           <Route path="create-listing" element={<PrivateRoute/>}>
             <Route path="/create-listing" element={<CreateListing/>}/>
+          </Route>
+          <Route path="edit-listing" element={<PrivateRoute/>}>
+            <Route path="/edit-listing/:listingId" element={<EditListing/>}/>
           </Route>
           <Route path="/sign-in" element={<SignIn/>}/>
           <Route path="/sign-up" element={<SignUp/>}/>
