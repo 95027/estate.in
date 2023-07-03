@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { db } from '../firebase/config';
 import Spinner from '../components/Spinner';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, A11y, Autoplay } from 'swiper';
+import { Navigation, Pagination, A11y, Autoplay, EffectFade } from 'swiper';
 import {FaShare, FaBed, FaBath, FaChair, FaParking } from 'react-icons/fa';
 import {MdLocationOn} from 'react-icons/md';
 import {getAuth} from 'firebase/auth';
@@ -44,10 +44,11 @@ const SingleListing = () => {
   return (
     <main>
         <Swiper
-            modules={[Navigation, Pagination, A11y, Autoplay]}
+            modules={[Navigation, Pagination, A11y, Autoplay, EffectFade]}
             slidesPerView={1}
             navigation
-            autoplay = {{delay: 3000}}
+            effect='fade'
+            autoplay = {{delay: 4000}}
             pagination={{ clickable: true}}>
                 {
                     listing.imgUrls.map((url, index)=>(
