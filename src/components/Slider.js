@@ -62,8 +62,8 @@ const Slider = () => {
           {listings.map(({data, id})=>(
             <SwiperSlide key={id} onClick={()=>navigate(`/category/${data.type}/${id}`)}>
               <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] overflow-hidden" style={{background:`url(${data.imgUrls[0]}) center no-repeat`, backgroundSize:"cover"}}></div>
-              <p className="absolute top-3 left-1 text-[#f1faee] font-medium bg-[#4579bd] rounded-br-2xl rounded-tl-2xl max-w-[90%] p-2 shadow-lg">{data.name}</p>
-              <p className="absolute bottom-1 left-1 text-[#f1faee] font-medium bg-[#e63946] rounded-tr-2xl rounded-bl-2xl max-w-[90%] p-2 shadow-lg">
+              <p className="absolute top-3 left-1 text-[#f1faee] text-xs sm:text-sm font-medium bg-[#4579bd] rounded-br-2xl rounded-tl-2xl max-w-[90%] p-2 shadow-lg">{data.name}</p>
+              <p className="absolute bottom-1 left-1 text-[#f1faee] text-xs sm:text-sm font-medium bg-[#e63946] rounded-tr-2xl rounded-bl-2xl max-w-[90%] p-2 shadow-lg">
                 $ {data.discountedPrice ?? data.regularPrice}
                 {data.type === "rent" && " / Month"}
               </p>

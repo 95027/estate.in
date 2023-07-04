@@ -59,14 +59,14 @@ const SingleListing = () => {
                     ))
                 }
         </Swiper>
-        <div className="fixed top-[15%] right-[.8%] z-10 cursor-pointer bg-white border-2 border-gray-400 rounded-full p-2" onClick={()=>{
+        <div className="fixed top-[25%] right-[1%] z-10 cursor-pointer bg-white border-2 border-gray-400 rounded-full p-1 sm:p-2" onClick={()=>{
             navigator.clipboard.writeText(window.location.href);
             setShareLink(true);
             setTimeout(()=>{
                 setShareLink(false);
             }, 2000)
             }}>
-            <FaShare className="text-xl text-slate-500" />
+            <FaShare className="text-lg sm:text-xl text-slate-500" />
         </div>
         {shareLink && <p className="fixed top-[18%] right-[10%] md:right-[6%] z-10 bg-white p-2 rounded-md border border-gray-400">Link Copied</p>}
         <div className="max-w-6xl flex flex-col md:flex-row items-center m-4 lg:mx-auto p-4 bg-white shadow-lg rounded-md md:space-x-5 space-y-5 md:space-y-0">
@@ -82,7 +82,7 @@ const SingleListing = () => {
                 )}
                 </div>
                 <p className="mt-4"><span className="font-semibold">Description: </span>{listing.description}</p>
-                <ul className="flex items-center font-semibold space-x-4 md:space-x-8 text-sm mt-4">
+                <ul className="w-full flex sm:items-center sm:flex-row sm:space-x-4 lg:space-x-8 space-y-1 flex-col font-semibold text-sm mt-4">
                     <li className="flex items-center whitespace-nowrap"><FaBed className="mr-1 text-lg" /> {+listing.beds > 1 ? `${listing.beds} Beds` : "1 Bed"}</li>
                     <li className="flex items-center whitespace-nowrap"><FaBath className="mr-1" /> {+listing.baths > 1 ? `${listing.baths} Baths` : "1 Bath"}</li>
                     <li className="flex items-center whitespace-nowrap"><FaParking className="mr-1 text-lg" /> {listing.parking  ? "Parking spot" : "No parking"}</li>
@@ -97,7 +97,7 @@ const SingleListing = () => {
                     <ContactLandlord userRef={listing.userRef} listing={listing} />
                 )}
             </div>
-            <div className="w-full md:h-[300px] h-[200px]">
+            <div className="w-full relative md:h-[300px] h-[200px] z-0 overflow-x-hidden">
             <MapContainer center={[listing.latitude, listing.longitude]} zoom={13} scrollWheelZoom={false}
                 style={{height: "100%", width:"100%"}}>
                 <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
