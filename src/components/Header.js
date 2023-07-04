@@ -32,7 +32,7 @@ const Header = () => {
         <header className='flex justify-between items-center px-3 max-w-6xl mx-auto'>
             <div className='flex items-center cursor-pointer sm:hover:scale-[1.05]' onClick={()=>navigate('/')}>
                 <img src={logo} alt="logo" className='h-5 cursor-pointer sm:h-10 ' />
-                <span className='px-2 text-sm text-blue-900 sm:text-xl'>estate.in</span>
+                <h2 className='px-2 text-sm text-blue-900 sm:text-xl'>estate.in</h2>
             </div>
             <div>
                 <ul className='flex space-x-5 sm:space-x-10'>

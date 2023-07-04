@@ -2,11 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+/*====== google fonts cdn =======*/
+@import url('https://fonts.googleapis.com/css2?family=Bacasime+Antique&family=Dosis:wght@300&family=Kalam:wght@300&family=Ysabeau+SC:wght@300&display=swap');
 
+/*
+font-family: 'Bacasime Antique', serif;
+font-family: 'Dosis', sans-serif;
+font-family: 'Kalam', cursive;
+font-family: 'Ysabeau SC', sans-serif;
+*/
+ul li
+{
+    font-family: 'Bacasime Antique', serif;
+}
+h1, h2
+{
+    font-family: 'Ysabeau SC', sans-serif;
+}
+form
+{
+    font-family: 'Dosis', sans-serif;
+}
+p
+{
+    font-family: 'Kalam', cursive;
+}
+button
+{
+    font-family: 'Courier New', Courier, monospace;
+}
 body
 {
     background-color:#dfece0;
 }
+html::-webkit-scrollbar
+{
+    display: none;
+}
+html
+{
+    scrollbar-width: none;
+}
+
+
 .border-bottom
 {
     color: #000;
@@ -18,3 +56,4 @@ body
         font-size: 24px !important;
     }
 }
+
