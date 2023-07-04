@@ -9,6 +9,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import CreateListing from "./pages/CreateListing";
 import EditListing from "./pages/EditListing";
 import SingleListing from "./pages/SingleListing";
+import Category from "./pages/Category";
 
 
 const Routings = () => {
@@ -29,6 +30,7 @@ const Routings = () => {
           <Route path="/sign-in" element={<SignIn/>}/>
           <Route path="/sign-up" element={<SignUp/>}/>
           <Route path="/forgot" element={<ForgotPassword/>}/>
+          <Route path="/category/:categoryName" element={<Category/>}/>
           <Route path="/category/:categoryName/:listingId" element={<SingleListing/>}/>
         </Routes>
     </>

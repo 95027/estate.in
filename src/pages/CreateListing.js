@@ -147,7 +147,7 @@ const CreateListing = () => {
   }
   return (
     <main className="max-w-md mx-auto px-2">
-      <h1 className="text-xl md:text-3xl text-center font-bold mt-6 text-blue-800">Create a Listing</h1>
+      <h1 className="text-xl md:text-3xl text-center font-bold mt-6 text-blue-600">Create a Listing</h1>
       <form onSubmit = {submitHandler}>
         <p className="text-base sm:text-lg font-semibold mt-6">Sell / Rent</p>
         <div className="flex">

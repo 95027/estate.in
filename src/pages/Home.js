@@ -90,7 +90,7 @@ const Home = () => {
   return (
     <>
       <Slider/>
-      <div className="max-w-6xl mx-auto space-y-6 px-3"> 
+      <div className="max-w-6xl mx-auto space-y-6 px-3 py-1"> 
 
         {/* ===== for offers ==========*/}
         {offerListings && offerListings.length > 0 && (

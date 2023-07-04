@@ -3,19 +3,22 @@ import Spinner from "../components/Spinner";
 import { collection, getDocs, limit, orderBy, query, startAfter, where } from "firebase/firestore";
 import { db } from "../firebase/config";
 import ListingItem from "../components/ListingItem";
+import { useParams } from "react-router-dom";
 
 
-const Offers = () => {
+const Category = () => {
 
   const [listings, setListings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lastFetchedListing, setLastFetchedListing] = useState(null);
 
+  const params = useParams();
+
   useEffect(()=>{
     async function fetchListings(){
       try {
         const listingsRef = collection(db, "listings");
-        const q = query(listingsRef, where("offer", "==", true), orderBy("timestamp", "desc"), limit(8));
+        const q = query(listingsRef, where("type", "==", params.categoryName), orderBy("timestamp", "desc"), limit(8));
         const querySnap = await getDocs(q);
         //for button fetching from the last
         const lastVisible = querySnap.docs[querySnap.docs.length - 1];
@@ -38,13 +41,13 @@ const Offers = () => {
 
     }
     fetchListings();
-  },[]);
+  },[params.categoryName]);
 
   //for load more listings
   async function fetchMoreListings(){
     try {
       const listingsRef = collection(db, "listings");
-      const q = query(listingsRef, where("offer", "==", true), orderBy("timestamp", "desc"),startAfter(lastFetchedListing), limit(4));
+      const q = query(listingsRef, where("type", "==", params.categoryName), orderBy("timestamp", "desc"),startAfter(lastFetchedListing), limit(4));
       const querySnap = await getDocs(q);
       //for button fetching from the last
       const lastVisible = querySnap.docs[querySnap.docs.length - 1];
@@ -73,7 +76,9 @@ const Offers = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-3 py-1">
-      <h1 className="text-3xl text-center text-blue-600 mt-6 font-bold">Offers</h1>
+      <h1 className="text-3xl text-center text-blue-600 mt-6 font-bold">
+        {params.categoryName === "rent" ? "Places for rent" : "Places for sale"}
+      </h1>
 
       {listings && listings.length > 0 ? (
       <>
@@ -90,11 +95,13 @@ const Offers = () => {
           </div>
         )}
       </>)
-       : <p>Currently no offres available</p>
+       : <p>
+            there are no current places for {params.categoryName === "rent" ? "rent" : "sale"}
+        </p>
        }
 
     </div>
   )
 }
 
-export default Offers
+export default Category

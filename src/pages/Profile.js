@@ -85,7 +85,7 @@ const Profile = () => {
   return (
     <>
       <section className="max-w-6xl mx-auto p-1">
-        <h1 className="text-2xl text-center text-blue-900 font-bold mt-6">My Profile</h1>
+        <h1 className="text-2xl text-center text-blue-600 font-bold mt-6">My Profile</h1>
         <div className="w-full md:w-[50%] mt-6 px-3 py-1 mx-auto">
           <form className="border-[1px] border-blue-900 rounded-md p-1">
             <div className="flex items-center ">
@@ -111,7 +111,7 @@ const Profile = () => {
       <section className="max-w-6xl mx-auto p-1 mt-10">
         {!loading && listings.length > 0 && (
           <>
-            <h2 className="text-xl md:text-2xl text-center text-blue-900 font-semibold">My listings</h2>
+            <h2 className="text-xl md:text-2xl text-center text-blue-600 font-semibold">My listings</h2>
             <ul className="sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 mt-6 mb-6">
               {
                 listings.map((listing)=>{
